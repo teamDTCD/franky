@@ -1,0 +1,118 @@
+//Definition of the pins
+//Define pins necessary for H-Bridge
+int enable_1 = 7; 
+int enable_2 = 8;
+int input_1 = 3;
+int input_2 = 4;
+int input_3 = 5;
+int input_4 = 6;
+//Define pins necessary for Line Sensor
+int line_sensor=12;
+//Define pins necessary for Object Detect
+#define object_sensor A0 // IR sensor on this pin
+//Call resistor for button
+int button = 9;
+void setup() {
+   //initialise line sensor, object detect and motors
+  pinMode(line_sensor, INPUT);
+  pinMode(object_sensor, INPUT);
+  pinMode(input_1, OUTPUT);
+  pinMode(input_2, OUTPUT);
+  pinMode(input_3, OUTPUT);
+  pinMode(input_4, OUTPUT);
+  //pinMode(button, INPUT_PULLUP);
+  digitalWrite(enable_1, HIGH);
+  digitalWrite(enable_2, HIGH); 
+  // put your setup code here, to run once:
+  Serial.begin(9600);
+  delay(100);
+}
+
+void loop() {
+int  detect = line_detect();
+  if (detect== 1) {
+  straight_line(0);
+  rotate(0);
+  reverse(1);
+  delay(2000);
+  reverse(0);
+  straight_line(0);
+  rotate(1);
+  delay(1000);
+}
+else {
+  rotate(0);
+  reverse(0);
+  straight_line(1);
+  delay(500);
+}
+  
+}
+  // put your main code here, to run repeatedly:
+void straight_line(int drive_check) {
+  //going to make this go forward-first deal with one side
+  //put inside an if block to make this stop and start at will
+  if (drive_check == 1) {
+    digitalWrite(input_1, HIGH);
+    digitalWrite(input_2, LOW);
+    //now deal with the other side
+    digitalWrite(input_3, HIGH);
+    digitalWrite(input_4, LOW);
+  }
+  else {
+    digitalWrite(input_1, LOW);
+    digitalWrite(input_2, LOW);
+    digitalWrite(input_3, LOW);
+    digitalWrite(input_4, LOW);
+  }
+  }
+void reverse(int reverse_check) {
+  //going to make this go backwards-first deal with one side
+  //put inside an if block to stop and start at will
+  if (reverse_check == 1) {
+  digitalWrite(input_1, LOW);
+  digitalWrite(input_2, HIGH);
+  //now deal with the other side
+  digitalWrite(input_3, LOW);
+  digitalWrite(input_4, HIGH);
+  }
+  else {
+  digitalWrite(input_1, LOW);
+  digitalWrite(input_2, LOW);
+  digitalWrite(input_3, LOW);
+  digitalWrite(input_4, LOW);
+  }
+}
+void rotate(int check) {
+  //put inside an if statement so that we can stop and start at will.
+  //idea here is to make one wheel turn one way and the other wheel turn the other way
+  //check is 1 for rotate, 0 otherwise
+  if (check == 1) {
+  //turn one wheel forward
+  digitalWrite(input_1, HIGH);
+  digitalWrite(input_2, LOW);
+  //turn the other wheel backwards
+  digitalWrite(input_3, LOW);
+  digitalWrite(input_4, HIGH);
+}
+else {
+  digitalWrite(input_1, LOW);
+  digitalWrite(input_2, LOW);
+  //turn the other wheel backwards
+  digitalWrite(input_3, LOW);
+  digitalWrite(input_4, LOW);
+}
+
+}
+int line_detect() {
+  //function to detect if the edge of the ring has been met. Return 1 for white i.e. edge has been met. Return 0 otherwise
+  int line_state = digitalRead(line_sensor);
+  int line_true;
+  if (line_state == 0) {
+    line_true = 0;
+  }
+  else {
+    line_true = 1;
+  }
+  return line_true;
+}
